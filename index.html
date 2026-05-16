@@ -3,36 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculator</title>
+  <title>Expecto</title>
+  <meta name="description" content="An interactive neural network visualizer. Poke neurons and watch them squirm.">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="calculator">
-    <div class="display">
-      <div class="display-previous" id="previousOperand"></div>
-      <div class="display-current" id="currentOperand">0</div>
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <div id="app">
+    <header>
+      <div class="logo-group">
+        <h1>Expecto</h1>
+        <span class="subtitle">Poke neurons. Watch them squirm.</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#" onclick="return false;">Projects</a>
+        <a href="#" onclick="return false;">Experiments</a>
+        <a href="#" onclick="return false;">About</a>
+      </nav>
+    </header>
+
+    <div class="squiggle-divider" aria-hidden="true">
+      <svg viewBox="0 0 300 25" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 15 C10 8, 20 22, 35 12 C50 2, 60 20, 80 14 C100 8, 110 22, 130 10 C150 0, 160 24, 185 12 C210 0, 220 20, 245 14 C260 8, 275 22, 300 15" stroke="#463f3a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      </svg>
     </div>
-    <div class="buttons">
-      <button class="btn span-2" data-action="clear">AC</button>
-      <button class="btn" data-action="delete">DEL</button>
-      <button class="btn operator" data-action="operator" data-value="/">÷</button>
-      <button class="btn" data-action="number" data-value="7">7</button>
-      <button class="btn" data-action="number" data-value="8">8</button>
-      <button class="btn" data-action="number" data-value="9">9</button>
-      <button class="btn operator" data-action="operator" data-value="*">×</button>
-      <button class="btn" data-action="number" data-value="4">4</button>
-      <button class="btn" data-action="number" data-value="5">5</button>
-      <button class="btn" data-action="number" data-value="6">6</button>
-      <button class="btn operator" data-action="operator" data-value="-">−</button>
-      <button class="btn" data-action="number" data-value="1">1</button>
-      <button class="btn" data-action="number" data-value="2">2</button>
-      <button class="btn" data-action="number" data-value="3">3</button>
-      <button class="btn operator" data-action="operator" data-value="+">+</button>
-      <button class="btn" data-action="number" data-value="0">0</button>
-      <button class="btn" data-action="decimal" data-value=".">.</button>
-      <button class="btn span-2 equals" data-action="equals">=</button>
+
+    <div class="main-layout">
+      <aside class="control-panel">
+        <section class="panel-section">
+          <h2>Network</h2>
+          <div class="control-row">
+            <label>Architecture</label>
+            <div class="btn-group">
+              <button class="btn-sm" id="btn-add-layer" title="Add hidden layer">+ Layer</button>
+              <button class="btn-sm" id="btn-remove-layer" title="Remove hidden layer">- Layer</button>
+            </div>
+          </div>
+          <div class="control-row">
+            <label>Neurons</label>
+            <div class="btn-group">
+              <button class="btn-sm" id="btn-add-neuron" title="Add neuron to each hidden layer">+ Neuron</button>
+              <button class="btn-sm" id="btn-remove-neuron" title="Remove neuron from each hidden layer">- Neuron</button>
+            </div>
+          </div>
+          <div class="control-row">
+            <label>Activation</label>
+            <select id="activation-select">
+              <option value="tanh">tanh</option>
+              <option value="relu">ReLU</option>
+              <option value="sigmoid">sigmoid</option>
+            </select>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Layers</span>
+            <span id="info-layers">3</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Parameters</span>
+            <span id="info-params">0</span>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2>Training</h2>
+          <div class="control-row">
+            <label>Problem</label>
+            <select id="problem-select">
+              <option value="xor">XOR</option>
+              <option value="circle">Circle</option>
+              <option value="spiral">Spiral</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <label>Learning rate</label>
+            <input type="range" id="lr-slider" min="-4" max="-1" step="0.1" value="-2">
+            <span id="lr-value">0.01</span>
+          </div>
+          <div class="control-row">
+            <label>Speed</label>
+            <input type="range" id="speed-slider" min="1" max="20" step="1" value="5">
+            <span id="speed-value">5</span>
+          </div>
+          <div class="btn-row">
+            <button class="btn-action" id="btn-train">Train</button>
+            <button class="btn-action secondary" id="btn-reset">Reset</button>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Epoch</span>
+            <span id="info-epoch">0</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Loss</span>
+            <span id="info-loss">&mdash;</span>
+          </div>
+        </section>
+
+        <section class="panel-section">
+          <h2>Display</h2>
+          <p class="hint">Drag neurons to rearrange. Click an input neuron to toggle its value.</p>
+          <div class="control-row">
+            <label>Show weights</label>
+            <input type="checkbox" id="show-weights" checked>
+          </div>
+          <div class="control-row">
+            <label>Animate signals</label>
+            <input type="checkbox" id="show-signals" checked>
+          </div>
+          <div class="control-row">
+            <label>Decision boundary</label>
+            <input type="checkbox" id="show-boundary">
+          </div>
+        </section>
+      </aside>
+
+      <div class="canvas-container">
+        <canvas id="network-canvas"></canvas>
+        <canvas id="boundary-canvas"></canvas>
+        <div class="tooltip" id="tooltip"></div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <span>Status</span>
+        <span class="stat-value" id="stat-status">Idle</span>
+      </div>
+      <div class="separator"></div>
+      <div class="stat">
+        <span>Epoch</span>
+        <span class="stat-value" id="stat-epoch">0</span>
+      </div>
+      <div class="separator"></div>
+      <div class="stat">
+        <span>Loss</span>
+        <span class="stat-value" id="stat-loss">&mdash;</span>
+      </div>
+      <div class="separator"></div>
+      <div class="stat">
+        <span>Params</span>
+        <span class="stat-value" id="stat-params">0</span>
+      </div>
     </div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
