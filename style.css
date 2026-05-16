@@ -1,0 +1,109 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a2e;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.calculator {
+  width: 320px;
+  background: #16213e;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.display {
+  padding: 24px 20px 16px;
+  background: #0f3460;
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.display-previous {
+  font-size: 14px;
+  color: #a0a0b0;
+  min-height: 20px;
+  word-break: break-all;
+}
+
+.display-current {
+  font-size: 36px;
+  color: #e0e0e0;
+  font-weight: 300;
+  word-break: break-all;
+  line-height: 1.2;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  padding: 1px;
+  background: #1a1a2e;
+}
+
+.btn {
+  padding: 20px;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+  background: #16213e;
+  color: #e0e0e0;
+  transition: background 0.15s;
+  font-family: inherit;
+  outline: none;
+}
+
+.btn:hover {
+  background: #1a2744;
+}
+
+.btn:active {
+  background: #0f3460;
+}
+
+.btn.span-2 {
+  grid-column: span 2;
+}
+
+.btn.operator {
+  background: #1a2744;
+  color: #e94560;
+}
+
+.btn.operator:hover {
+  background: #1e2f50;
+}
+
+.btn.operator:active {
+  background: #e94560;
+  color: #fff;
+}
+
+.btn.equals {
+  background: #e94560;
+  color: #fff;
+}
+
+.btn.equals:hover {
+  background: #f05672;
+}
+
+.btn.equals:active {
+  background: #c73550;
+}
